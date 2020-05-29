@@ -20,7 +20,7 @@ xml-validator [OPTIONS] XML_FILE SCHEMA_FILE
 
 Options:
   -v, --verbose  Verbose printout for XML validation errors.
-  --help         Shows
+  --help         Shows help
 ```
 
 ### Packages/Libraries used
