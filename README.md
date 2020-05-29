@@ -26,7 +26,7 @@ Options:
 ### Packages/Libraries used
 
 * [Click](https://click.palletsprojects.com/en/7.x/)
-* [xmlchema](https://xmlschema.readthedocs.io/en/latest/index.html)
+* [xmlschema](https://xmlschema.readthedocs.io/en/latest/index.html)
 
 ## License
 
