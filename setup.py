@@ -2,6 +2,9 @@ from setuptools import setup, find_packages
 
 from validator import __author__, __title__, __version__
 
+with open("requirements.txt") as reqs:
+    requirements = reqs.read().splitlines()
+
 setup(
     # Core metadata specification here:
     # https://packaging.python.org/specifications/core-metadata/
@@ -12,10 +15,7 @@ setup(
 
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[
-        'Click',
-        'xmlschema',
-    ],
+    install_requires=requirements,
     entry_points='''
         [console_scripts]
         xml-validate=validator.__main__:cli
