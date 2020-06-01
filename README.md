@@ -6,21 +6,16 @@ Command line tool for validating a given XML file against a specific XSD Schema.
 
 ### Installing
 
-```
-virtualenv venv
-. venv/bin/activate
-
-pip install ./xml-validator
-```
+Clone the project and install with: `pip install .`
 
 ### Usage
 
 ```
-xml-validator [OPTIONS] XML_FILE SCHEMA_FILE
+xml-validate [OPTIONS] XML_FILE SCHEMA_FILE
 
 Options:
   -v, --verbose  Verbose printout for XML validation errors.
-  --help         Shows help
+  --help         Shows help.
 ```
 
 ### Packages/Libraries used
@@ -30,4 +25,8 @@ Options:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contibuting
+
+If you want to contribute to a project and make it better, your help is very welcome. For more info about how to contribute, see [CONTRIBUTING](CONTRIBUTING.md).
