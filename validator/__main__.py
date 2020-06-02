@@ -25,3 +25,6 @@ def cli(xml_file, schema_file, verbose):
         click.echo("Faulty XML or XSD file was given.\n")
         if verbose:
             click.echo(f"Error: {err}")
+            
+if __name__ == "__main__":
+    cli()
