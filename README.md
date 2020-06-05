@@ -8,6 +8,14 @@ Command line tool for validating a given XML file against a specific XSD Schema.
 
 Clone the project and install with: `pip install .`
 
+### Tests
+
+Tests can be executed with tox automation:
+```
+# pip install tox (if not installed)
+tox
+```
+
 ### Usage
 
 ```
