@@ -27,9 +27,10 @@ class TestXMLValidator(unittest.TestCase):
     def test_no_args(self):
         """Test case where no args are passed."""
         result = self.runner.invoke(cli, [])
-        assert result.exception  # Catch any exception
-        assert result.exit_code == 2  # Catch specifically a usage error
-        # The specific error message
+
+        # Exit with code 2 (UsageError)
+        self.assertEqual(result.exit_code, 2)
+        # The specific error message in output
         self.assertIn("Error: Missing argument 'XML_FILE'", result.output)
 
     def test_one_arg(self):
@@ -37,9 +38,10 @@ class TestXMLValidator(unittest.TestCase):
         filename = "SUBMISSION.xml"
         testfile = (self.xml_path / filename).as_posix()
         result = self.runner.invoke(cli, [testfile])
-        assert result.exception  # Catch any exception
-        assert result.exit_code == 2  # Catch specifically a UsageError
-        # The specific error message
+
+        # Exit with code 2 (UsageError)
+        self.assertEqual(result.exit_code, 2)
+        # The specific error message in output
         self.assertIn("Error: Missing argument 'SCHEMA_FILE'", result.output)
 
     def test_too_many_args(self):
@@ -49,9 +51,10 @@ class TestXMLValidator(unittest.TestCase):
         xml = (self.xml_path / xml_name).as_posix()
         xsd = (self.xsd_path / xsd_name).as_posix()
         result = self.runner.invoke(cli, [xml, xsd, xsd])
-        assert result.exception  # Catch any exception
-        assert result.exit_code == 2  # Catch specifically a UsageError
-        # The specific error message
+
+        # Exit with code 2 (UsageError)
+        self.assertEqual(result.exit_code, 2)
+        # The specific error message in output
         self.assertIn("Error: Got unexpected extra argument", result.output)
 
     def test_bad_filepath(self):
@@ -61,9 +64,10 @@ class TestXMLValidator(unittest.TestCase):
         xml = (self.xml_path / xml_name).as_posix()
         xsd = (self.xsd_path / xsd_name).as_posix()
         result = self.runner.invoke(cli, [xml, xsd])
-        assert result.exception  # Catch any exception
-        assert result.exit_code == 2  # Script exits correctly
-        # The specific error message
+
+        # Exit with code 2 (UsageError)
+        self.assertEqual(result.exit_code, 2)
+        # The specific error message in output
         self.assertIn("Error: Invalid value for 'XML_FILE'", result.output)
 
     def test_faulty_xml_file(self):
@@ -73,7 +77,9 @@ class TestXMLValidator(unittest.TestCase):
         xml = (self.xml_path / xml_name).as_posix()
         xsd = (self.xsd_path / xsd_name).as_posix()
         result = self.runner.invoke(cli, [xml, xsd])
-        assert result.exit_code == 0  # Script exits correctly
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
         # The correct output is given
         self.assertEqual("Faulty XML or XSD file was given.\n\n",
                          result.output)
@@ -85,7 +91,9 @@ class TestXMLValidator(unittest.TestCase):
         xml = (self.xml_path / xml_name).as_posix()
         xsd = (self.xsd_path / xsd_name).as_posix()
         result = self.runner.invoke(cli, [xml, xsd])
-        assert result.exit_code == 0  # Script exits correctly
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
         # The correct output is given
         self.assertEqual(xml + " is valid.\n\n", result.output)
 
@@ -96,7 +104,9 @@ class TestXMLValidator(unittest.TestCase):
         xml = (self.xml_path / xml_name).as_posix()
         xsd = (self.xsd_path / xsd_name).as_posix()
         result = self.runner.invoke(cli, [xml, xsd])
-        assert result.exit_code == 0  # Script exits correctly
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
         # The correct output is given
         self.assertEqual(xml + " is valid.\n\n", result.output)
 
@@ -107,7 +117,9 @@ class TestXMLValidator(unittest.TestCase):
         xml = (self.xml_path / xml_name).as_posix()
         xsd = (self.xsd_path / xsd_name).as_posix()
         result = self.runner.invoke(cli, [xml, xsd])
-        assert result.exit_code == 0  # Script exits correctly
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
         # The correct output is given
         self.assertEqual(xml + " is valid.\n\n", result.output)
 
@@ -118,7 +130,9 @@ class TestXMLValidator(unittest.TestCase):
         xml = (self.xml_path / xml_name).as_posix()
         xsd = (self.xsd_path / xsd_name).as_posix()
         result = self.runner.invoke(cli, [xml, xsd])
-        assert result.exit_code == 0  # Script exits correctly
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
         # The correct output is given
         self.assertEqual(xml + " is invalid.\n\n", result.output)
 
@@ -129,7 +143,9 @@ class TestXMLValidator(unittest.TestCase):
         xml = (self.xml_path / xml_name).as_posix()
         xsd = (self.xsd_path / xsd_name).as_posix()
         result = self.runner.invoke(cli, [xml, xsd])
-        assert result.exit_code == 0  # Script exits correctly
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
         # The correct output is given
         self.assertEqual(xml + " is invalid.\n\n", result.output)
 
