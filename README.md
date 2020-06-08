@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/CSCfi/metadata-submitter-tools.svg?branch=master)](https://travis-ci.com/CSCfi/metadata-submitter-tools)
+
 # Metadata submitter tools
 
 ## XML Validation CLI

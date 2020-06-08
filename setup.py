@@ -16,6 +16,10 @@ setup(
     packages=find_packages(exclude=["tests"]),
     include_package_data=True,
     install_requires=requirements,
+    extras_require={
+        'test': ['coverage', 'pytest', 'pytest-cov',
+                 'coveralls', 'tox']
+    },
     entry_points='''
         [console_scripts]
         xml-validate=validator.__main__:cli
