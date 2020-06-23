@@ -4,7 +4,7 @@
 
 ## XML Validation CLI
 
-Command line tool for validating a given XML file against a specific XSD Schema.
+Command-line tool for validating a given XML file against a specific XSD Schema.
 
 ### Installing
 

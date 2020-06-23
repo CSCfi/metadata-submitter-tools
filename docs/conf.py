@@ -1,7 +1,14 @@
 """Configuration file for the Sphinx documentation builder."""
 
+import os
+import sys
 import datetime
-from typing import Callable
+# from typing import Callable
+
+import validator
+
+# Get the project root dir, which is the parent dir of this
+sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
@@ -12,7 +19,7 @@ copyright = f'{current_year}, CSC Developers'
 author = 'CSC Developers'
 
 # The short X.Y version.
-version = str(minimalpy.__version__)
+version = str(validator.__version__)
 # The full version, including alpha/beta/rc tags
 release = '0.1.0-alpha'
 
@@ -33,15 +40,16 @@ extensions = ['sphinx.ext.autodoc',
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
+# The suffix of source filenames.
+source_suffix = '.rst'
+
 # The master toctree document.
 master_doc = 'index'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store
-
-master_doc = 'index'
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 autosummary_generate = True
 
@@ -59,6 +67,6 @@ html_theme_options = {
     'prev_next_buttons_location': 'bottom'}
 
 
-def setup(app: Callable) -> None:
-    """Add custom stylesheet."""
-    app.add_css_file('custom.css')
+# def setup(app: Callable) -> None:
+#     """Add custom stylesheet."""
+#    app.add_css_file('custom.css')
