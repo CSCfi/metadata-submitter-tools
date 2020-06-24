@@ -8,25 +8,37 @@ Command-line tool for validating a given XML file against a specific XSD Schema.
 
 ### Installing
 
-Clone the project and install with: `pip install .`
+Clone the project and install with `pip`:
+```
+git clone https://github.com/CSCfi/metadata-submitter-tools.git
+cd metadata-submitter-tools
+pip install .
+```
 
 ### Tests
 
 Tests can be executed with tox automation:
 ```
-# pip install tox (if not installed)
+# Install tox first if not installed
+pip install tox
+# Run tests
 tox
 ```
 
 ### Usage
 
-```
-xml-validate [OPTIONS] XML_FILE SCHEMA_FILE
+After installation, the validation tool is used by by executing `xml-validate` in a terminal with specified options/arguments followingly:
 
-Options:
-  -v, --verbose  Verbose printout for XML validation errors.
-  --help         Shows help.
 ```
+xml-validate <option> <xml-file> <schema-file>
+```
+
+The `<xml-file>` and `<schema-file>` arguments need to be the correct filenames (including path) of a local XML file and the corresponding XSD file.
+The `<option>` can be `--help` for showing help and `-v` or `--verbose` for delivering a detailed validation error message.
+
+Below is a terminal demonstration of the usage of this tool, which displays the different outputs the CLI will produce:
+
+[![asciicast](https://asciinema.org/a/ykioH41E9Y38fG404hReQedyc.svg)](https://asciinema.org/a/ykioH41E9Y38fG404hReQedyc)
 
 ### Packages/Libraries used
 
