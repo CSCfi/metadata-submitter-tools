@@ -2,4 +2,4 @@
 
 __title__ = 'xml-validator'
 __version__ = VERSION = '0.1'
-__author__ = 'csc-jm'
+__author__ = 'CSC Developers'
