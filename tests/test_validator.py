@@ -149,6 +149,21 @@ class TestXMLValidator(unittest.TestCase):
         # The correct output is given
         self.assertEqual(xml + " is invalid.\n\n", result.output)
 
+    def test_valid_xml_from_url(self):
+        """Test validating XML from URL."""
+        xml_url = "https://www.ebi.ac.uk/ena/browser/api/xml/SAMEA2620084"
+        xsd_name = "SRA.sample.xsd"
+        xsd = (self.xsd_path / xsd_name).as_posix()
+        result = self.runner.invoke(cli, [xml_url, xsd])
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
+        # The correct output is given
+        self.assertEqual("is valid.\n\n", result.output)
+
+    # TODO more tests for URL cases
+    # FIX previous tests
+
 
 if __name__ == '__main__':
     unittest.main()
