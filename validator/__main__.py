@@ -1,21 +1,24 @@
 import click
-import xmlschema
-import xml
+import os
 import requests
+import xml
+import xmlschema
 
 
 @click.command()
-@click.argument('xml_file', type=click.Path())
+@click.argument('xml_file')
 @click.argument('schema_file', type=click.Path(exists=True))
 @click.option('-v', '--verbose', is_flag=True,
               help="Verbose printout for XML validation errors.")
 def cli(xml_file, schema_file, verbose):
     """Validates an XML against an XSD SCHEMA."""
+
+    """Deterimine if argument is an URL"""
     try:
-        # Checking if the given argument was an URL
         resp = requests.get(xml_file)
         if 'xml' not in resp.headers['Content-Type']:
-            click.echo("Content of the URL is not in an XML format. " +
+            click.echo(f"Error: Content of the URL ({resp.url})\n" +
+                       "is not in an XML format. " +
                        "Make sure the URL is correct.\n")
             return
         if resp.status_code != requests.codes.ok:
@@ -24,18 +27,22 @@ def cli(xml_file, schema_file, verbose):
         xml_from_url = True
 
     except requests.exceptions.HTTPError as error:
+        # If request responds with HTTP error
         click.echo(str(error) + "\nMake sure the URL is correct.\n")
         return
 
     except ValueError:
-        # If argument is entered as a path to a local file
+        # If argument is an existing path to a local file
         xml_from_url = False
 
-    # TODO handle errors from path bad paths (URLError)
+    if not xml_from_url and not os.path.isfile(xml_file):
+        click.echo(f"Error:\nInvalid value: Path {xml_file} does not exist.\n")
+        return
 
+    """Validation"""
     try:
         xmlschema.validate(xml_file, schema=schema_file)
-        # If validation succeeds
+        # When validation succeeds
         if xml_from_url:
             click.echo(f"The XML from the URL:\n{resp.url}")
             click.secho("is valid.\n", fg='green')
@@ -43,8 +50,9 @@ def cli(xml_file, schema_file, verbose):
             click.echo("The XML file: " +
                        click.format_filename(xml_file, shorten=True))
             click.secho("is valid.\n", fg='green')
+
     except xmlschema.validators.exceptions.XMLSchemaValidationError as err:
-        # If validation does not succeed
+        # When validation does not succeed
         if xml_from_url:
             click.echo(f"The XML from the URL:\n{resp.url}")
             click.secho("is invalid.\n", fg='red')
@@ -55,6 +63,7 @@ def cli(xml_file, schema_file, verbose):
         if verbose:
             click.secho("Error:", bold=True)
             click.echo(err)
+
     except xml.etree.ElementTree.ParseError as err:
         # If there is a syntax error with either file
         click.echo("Faulty XML or XSD file was given.\n")

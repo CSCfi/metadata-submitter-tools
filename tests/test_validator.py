@@ -65,10 +65,10 @@ class TestXMLValidator(unittest.TestCase):
         xsd = (self.xsd_path / xsd_name).as_posix()
         result = self.runner.invoke(cli, [xml, xsd])
 
-        # Exit with code 2 (UsageError)
-        self.assertEqual(result.exit_code, 2)
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
         # The specific error message in output
-        self.assertIn("Error: Invalid value for 'XML_FILE'", result.output)
+        self.assertIn("Invalid value", result.output)
 
     def test_faulty_xml_file(self):
         """Test case for xml with incorrect xml syntax."""
@@ -95,7 +95,8 @@ class TestXMLValidator(unittest.TestCase):
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
-        self.assertEqual(xml + " is valid.\n\n", result.output)
+        self.assertEqual("The XML file: SAMPLE.xml\nis valid.\n\n",
+                         result.output)
 
     def test_valid_study_file(self):
         """Test case for a valid study xml file."""
@@ -108,7 +109,8 @@ class TestXMLValidator(unittest.TestCase):
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
-        self.assertEqual(xml + " is valid.\n\n", result.output)
+        self.assertEqual("The XML file: STUDY.xml\nis valid.\n\n",
+                         result.output)
 
     def test_valid_submission_file(self):
         """Test case for a valid submission xml file."""
@@ -121,7 +123,8 @@ class TestXMLValidator(unittest.TestCase):
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
-        self.assertEqual(xml + " is valid.\n\n", result.output)
+        self.assertEqual("The XML file: SUBMISSION.xml\nis valid.\n\n",
+                         result.output)
 
     def test_invalid_submission_file(self):
         """Test case for an invalid submission xml file."""
@@ -134,7 +137,8 @@ class TestXMLValidator(unittest.TestCase):
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
-        self.assertEqual(xml + " is invalid.\n\n", result.output)
+        self.assertIn("The XML file: invalid_SUBMISSION.xml\nis invalid.",
+                      result.output)
 
     def test_valid_xml_against_wrong_schema(self):
         """Test case for a valid xml file against the wrong schema."""
@@ -147,7 +151,8 @@ class TestXMLValidator(unittest.TestCase):
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
-        self.assertEqual(xml + " is invalid.\n\n", result.output)
+        self.assertEqual("The XML file: SUBMISSION.xml\nis invalid.\n\n",
+                         result.output)
 
     def test_valid_xml_from_url(self):
         """Test validating XML from URL."""
@@ -159,7 +164,8 @@ class TestXMLValidator(unittest.TestCase):
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
-        self.assertEqual("is valid.\n\n", result.output)
+        self.assertIn("The XML from the URL:\n" + xml_url + "\nis valid.\n\n",
+                      result.output)
 
     # TODO more tests for URL cases
     # FIX previous tests
