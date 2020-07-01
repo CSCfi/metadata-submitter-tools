@@ -1,8 +1,7 @@
 import click
 import xmlschema
 import xml
-import urllib
-from urllib import request
+import requests
 
 
 @click.command()
@@ -14,18 +13,20 @@ def cli(xml_file, schema_file, verbose):
     """Validates an XML against an XSD SCHEMA."""
     try:
         # Checking if the given argument was an URL
-        xml_url = request.urlopen(xml_file)
-        info = xml_url.info()
-        if 'xml' not in info.get_content_type():
+        resp = requests.get(xml_file)
+        if 'xml' not in resp.headers['Content-Type']:
             click.echo("Content of the URL is not in an XML format. " +
                        "Make sure the URL is correct.\n")
             return
-        xml_file = xml_url
+        if resp.status_code != requests.codes.ok:
+            resp.raise_for_status()
+        xml_file = resp.text
         xml_from_url = True
-    except urllib.error.HTTPError:
-        click.echo("URL responded with HTTP error. " +
-                   "Make sure the URL is correct.\n")
+
+    except requests.exceptions.HTTPError as error:
+        click.echo(str(error) + "\nMake sure the URL is correct.\n")
         return
+
     except ValueError:
         # If argument is entered as a path to a local file
         xml_from_url = False
@@ -36,7 +37,7 @@ def cli(xml_file, schema_file, verbose):
         xmlschema.validate(xml_file, schema=schema_file)
         # If validation succeeds
         if xml_from_url:
-            click.echo(f"The XML from the URL:\n{xml_file.geturl()}")
+            click.echo(f"The XML from the URL:\n{resp.url}")
             click.secho("is valid.\n", fg='green')
         else:
             click.echo("The XML file: " +
@@ -45,7 +46,7 @@ def cli(xml_file, schema_file, verbose):
     except xmlschema.validators.exceptions.XMLSchemaValidationError as err:
         # If validation does not succeed
         if xml_from_url:
-            click.echo(f"The XML from the URL:\n{xml_file.geturl()}")
+            click.echo(f"The XML from the URL:\n{resp.url}")
             click.secho("is invalid.\n", fg='red')
         else:
             click.echo("The XML file: " +
