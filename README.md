@@ -15,6 +15,13 @@ cd metadata-submitter-tools
 pip install .
 ```
 
+Note: If running the tool results in a `RuntimeError` about Python 3 using ASCII as encoding,
+you will need to set the following environment variables:
+```
+export LC_ALL=en_US.utf-8
+export LANG=en_US.utf-8
+```
+
 ### Tests
 
 Tests can be executed with tox automation:
