@@ -168,7 +168,6 @@ class TestXMLValidator(unittest.TestCase):
                       result.output)
 
     # TODO more tests for URL cases
-    # FIX previous tests
 
 
 if __name__ == '__main__':
