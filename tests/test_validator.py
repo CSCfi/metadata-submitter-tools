@@ -167,7 +167,8 @@ class TestXMLValidator(unittest.TestCase):
         self.assertIn("The XML from the URL:\n" + xml_url + "\nis valid.\n\n",
                       result.output)
 
-    def test_xml_error(self):
+    def test_http_error(self):
+        """Test when URL gives HTTP error."""
         xml_url = "https://www.ebi.ac.uk/ena/browser/api/xml/wrong_indicator"
         xsd_name = "SRA.sample.xsd"
         xsd = (self.xsd_path / xsd_name).as_posix()
@@ -179,6 +180,7 @@ class TestXMLValidator(unittest.TestCase):
         self.assertIn("HTTP Error 400", result.output)
 
     def test_url_to_non_xml(self):
+        """Test for URL that does not return XML."""
         xml_url = "https://www.example.com"
         xsd_name = "SRA.sample.xsd"
         xsd = (self.xsd_path / xsd_name).as_posix()
@@ -189,7 +191,8 @@ class TestXMLValidator(unittest.TestCase):
         # The correct output is given
         self.assertIn("Error: Content of the URL", result.output)
 
-    def test_schema_from_ftp_url(self):
+    def test_ftp_url(self):
+        """Test validating with schema from FTP URL."""
         xml_name = "SUBMISSION.xml"
         xsd_url = ("ftp://ftp.ebi.ac.uk/pub/databases/ena/doc/xsd/sra_1_5/"
                    "SRA.submission.xsd")
@@ -203,6 +206,7 @@ class TestXMLValidator(unittest.TestCase):
                          result.output)
 
     def test_both_args_as_urls(self):
+        """Test with both arguments as URLs with valid files."""
         xml_url = "https://www.ebi.ac.uk/ena/browser/api/xml/SAMEA2620084"
         xsd_url = ("ftp://ftp.ebi.ac.uk/pub/databases/ena/doc/xsd/sra_1_5/"
                    "SRA.sample.xsd")
@@ -215,7 +219,21 @@ class TestXMLValidator(unittest.TestCase):
         self.assertIn("The XML from the URL", result.output)
         self.assertIn("is valid.", result.output)
 
-    # TODO add inline comments
+    def test_wrong_file_type_from_ftp(self):
+        """Test when FTP URL provides another file type than xml/xsd."""
+        xml_name = "SUBMISSION.xml"
+        xml = (self.xml_path / xml_name).as_posix()
+        # A test file created by Tele2
+        xsd_url = "ftp://speedtest.tele2.net/1KB.zip"
+
+        result = self.runner.invoke(cli, [xml, xsd_url])
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
+        # The correct output is given
+        self.assertEqual("Faulty XML or XSD file was given.\n\n", result.output)
+
+    # TODO verbose test
 
 
 if __name__ == '__main__':

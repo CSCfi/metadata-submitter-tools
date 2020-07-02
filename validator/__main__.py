@@ -15,6 +15,9 @@ def xmlFromURL(url, arg_type):
                      "is not in an XML format. " +
                      "Make sure the URL is correct.\n")
             raise Exception(error)
+        elif scheme == 'file':
+            file_path = url.replace("file://", "")
+            return file_path
         else:
             return resp
 
@@ -32,15 +35,6 @@ def xmlFromURL(url, arg_type):
         error = (str(error) + "" + url + "\nMake sure the URL is correct.\n")
         raise Exception(error)
 
-    '''
-    except urllib.error.URLError:
-        error = (f"Error: Invalid value for {arg_type}\n" +
-                 f"No file or directory: {url}\n")
-        raise Exception(error)
-    '''
-
-    # FIX local files
-
 
 @click.command()
 @click.argument('xml_file')
@@ -51,7 +45,6 @@ def cli(xml_file, schema_file, verbose):
     """Validates an XML against an XSD SCHEMA."""
 
     xml_from_url = False
-    # xsd_from_url = False
     try:
         xml_resp = xmlFromURL(xml_file, 'XML_FILE')
         if xml_resp:
@@ -61,7 +54,6 @@ def cli(xml_file, schema_file, verbose):
         xsd_resp = xmlFromURL(schema_file, 'SCHEMA_FILE')
         if xsd_resp:
             schema_file = xsd_resp
-            # xsd_from_url = True
 
     except Exception as error:
         click.echo(error)
@@ -95,6 +87,13 @@ def cli(xml_file, schema_file, verbose):
         # If there is a syntax error with either file
         click.echo("Faulty XML or XSD file was given.\n")
         if verbose:
+            click.echo(f"Error: {err}")
+
+    except xmlschema.exceptions.XMLSchemaException as err:
+        if not verbose:
+            click.echo("Validation ran into an unexpected error." +
+                       " Run command with --verbose option for more details\n")
+        else:
             click.echo(f"Error: {err}")
 
 
