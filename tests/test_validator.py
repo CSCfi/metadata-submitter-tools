@@ -68,7 +68,7 @@ class TestXMLValidator(unittest.TestCase):
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The specific error message in output
-        self.assertIn("Invalid value", result.output)
+        self.assertIn("Error: Invalid value for XML_FILE", result.output)
 
     def test_faulty_xml_file(self):
         """Test case for xml with incorrect xml syntax."""
@@ -167,7 +167,55 @@ class TestXMLValidator(unittest.TestCase):
         self.assertIn("The XML from the URL:\n" + xml_url + "\nis valid.\n\n",
                       result.output)
 
-    # TODO more tests for URL cases
+    def test_xml_error(self):
+        xml_url = "https://www.ebi.ac.uk/ena/browser/api/xml/wrong_indicator"
+        xsd_name = "SRA.sample.xsd"
+        xsd = (self.xsd_path / xsd_name).as_posix()
+        result = self.runner.invoke(cli, [xml_url, xsd])
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
+        # The correct output is given
+        self.assertIn("HTTP Error 400", result.output)
+
+    def test_url_to_non_xml(self):
+        xml_url = "https://www.example.com"
+        xsd_name = "SRA.sample.xsd"
+        xsd = (self.xsd_path / xsd_name).as_posix()
+        result = self.runner.invoke(cli, [xml_url, xsd])
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
+        # The correct output is given
+        self.assertIn("Error: Content of the URL", result.output)
+
+    def test_schema_from_ftp_url(self):
+        xml_name = "SUBMISSION.xml"
+        xsd_url = ("ftp://ftp.ebi.ac.uk/pub/databases/ena/doc/xsd/sra_1_5/"
+                   "SRA.submission.xsd")
+        xml = (self.xml_path / xml_name).as_posix()
+        result = self.runner.invoke(cli, [xml, xsd_url])
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
+        # The correct output is given
+        self.assertEqual("The XML file: SUBMISSION.xml\nis valid.\n\n",
+                         result.output)
+
+    def test_both_args_as_urls(self):
+        xml_url = "https://www.ebi.ac.uk/ena/browser/api/xml/SAMEA2620084"
+        xsd_url = ("ftp://ftp.ebi.ac.uk/pub/databases/ena/doc/xsd/sra_1_5/"
+                   "SRA.sample.xsd")
+
+        result = self.runner.invoke(cli, [xml_url, xsd_url])
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
+        # The correct output is given
+        self.assertIn("The XML from the URL", result.output)
+        self.assertIn("is valid.", result.output)
+
+    # TODO add inline comments
 
 
 if __name__ == '__main__':

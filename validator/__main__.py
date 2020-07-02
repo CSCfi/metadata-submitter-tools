@@ -1,6 +1,6 @@
 import click
 import os
-import requests
+import urllib
 import xml
 import xmlschema
 
@@ -8,14 +8,13 @@ import xmlschema
 def xmlFromURL(url, arg_type):
     """Deterimine if argument is an URL and return content from the URL."""
     try:
-        resp = requests.get(url)
-        if 'xml' not in resp.headers['Content-Type']:
-            error = (f"Error: Content of the URL ({resp.url})\n" +
+        resp = urllib.request.urlopen(url)
+        scheme = urllib.parse.urlparse(url).scheme
+        if 'http' in scheme and 'xml' not in resp.info().get_content_type():
+            error = (f"Error: Content of the URL ({resp.geturl()})\n" +
                      "is not in an XML format. " +
                      "Make sure the URL is correct.\n")
             raise Exception(error)
-        elif resp.status_code != requests.codes.ok:
-            resp.raise_for_status()
         else:
             return resp
 
@@ -28,10 +27,19 @@ def xmlFromURL(url, arg_type):
         else:
             return None
 
-    except requests.exceptions.HTTPError as error:
+    except urllib.error.HTTPError as error:
         # If request responds with HTTP error
-        error = (str(error) + "\nMake sure the URL is correct.\n")
+        error = (str(error) + "" + url + "\nMake sure the URL is correct.\n")
         raise Exception(error)
+
+    '''
+    except urllib.error.URLError:
+        error = (f"Error: Invalid value for {arg_type}\n" +
+                 f"No file or directory: {url}\n")
+        raise Exception(error)
+    '''
+
+    # FIX local files
 
 
 @click.command()
@@ -43,17 +51,17 @@ def cli(xml_file, schema_file, verbose):
     """Validates an XML against an XSD SCHEMA."""
 
     xml_from_url = False
-    #xsd_from_url = False
+    # xsd_from_url = False
     try:
         xml_resp = xmlFromURL(xml_file, 'XML_FILE')
         if xml_resp:
-            xml_file = xml_resp.text
+            xml_file = xml_resp
             xml_from_url = True
 
         xsd_resp = xmlFromURL(schema_file, 'SCHEMA_FILE')
         if xsd_resp:
-            schema_file = xsd_resp.text
-            #xsd_from_url = True
+            schema_file = xsd_resp
+            # xsd_from_url = True
 
     except Exception as error:
         click.echo(error)
