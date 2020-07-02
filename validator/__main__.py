@@ -22,7 +22,7 @@ def xmlFromURL(url, arg_type):
             return resp
 
     except ValueError:
-        # If argument is an existing path to a local file
+        # If argument is not entered as an URL
         if not os.path.isfile(url):
             error = (f"Error: Invalid value for {arg_type}\n" +
                      f"Path {url} does not exist.\n")
@@ -30,9 +30,14 @@ def xmlFromURL(url, arg_type):
         else:
             return None
 
-    except urllib.error.HTTPError as error:
+    except urllib.error.HTTPError as err:
         # If request responds with HTTP error
-        error = (str(error) + "" + url + "\nMake sure the URL is correct.\n")
+        error = (str(err) + "" + url + "\nMake sure the URL is correct.\n")
+        raise Exception(error)
+
+    except urllib.error.URLError:
+        error = (f"Error: Invalid value for {arg_type}\n" +
+                 f"Path {url.replace('file://', '')} does not exist.\n")
         raise Exception(error)
 
 
@@ -91,7 +96,7 @@ def cli(xml_file, schema_file, verbose):
 
     except xmlschema.exceptions.XMLSchemaException as err:
         if not verbose:
-            click.echo("Validation ran into an unexpected error." +
+            click.echo("\nValidation ran into an unexpected error." +
                        " Run command with --verbose option for more details\n")
         else:
             click.echo(f"Error: {err}")
