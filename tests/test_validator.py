@@ -156,6 +156,8 @@ class TestXMLValidator(unittest.TestCase):
 
     def test_valid_xml_from_url(self):
         """Test validating XML from URL."""
+
+        # XML from European Nucleotide Archive browser
         xml_url = "https://www.ebi.ac.uk/ena/browser/api/xml/SAMEA2620084"
         xsd_name = "SRA.sample.xsd"
         xsd = (self.xsd_path / xsd_name).as_posix()
@@ -233,7 +235,18 @@ class TestXMLValidator(unittest.TestCase):
         # The correct output is given
         self.assertEqual("Faulty XML or XSD file was given.\n\n", result.output)
 
-    # TODO verbose test
+    def test_verbose_option(self):
+        """Test verbose flag outputs some error details when XML is invalid."""
+        xml_name = "invalid_SUBMISSION.xml"
+        xsd_name = "SRA.submission.xsd"
+        xml = (self.xml_path / xml_name).as_posix()
+        xsd = (self.xsd_path / xsd_name).as_posix()
+        result = self.runner.invoke(cli, ['-v', xml, xsd])
+
+        # Exit correctly with code 0
+        self.assertEqual(result.exit_code, 0)
+        # The correct output is given
+        self.assertIn("Error:\nfailed validating", result.output)
 
 
 if __name__ == '__main__':
