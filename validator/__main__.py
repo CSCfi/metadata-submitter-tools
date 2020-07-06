@@ -1,28 +1,53 @@
 import click
 import os
-import urllib
+import requests
 import xml
 import xmlschema
+import ftplib
+from io import StringIO
+from urllib.parse import urlparse
+
+# Change environment variables for Click commands to work
+os.environ['LC_ALL'] = 'en_US.utf-8'
+os.environ['LANG'] = 'en_US.utf-8'
 
 
 def xmlFromURL(url, arg_type):
     """Deterimine if argument is an URL and return content from the URL."""
     try:
-        resp = urllib.request.urlopen(url)
-        scheme = urllib.parse.urlparse(url).scheme
-        if 'http' in scheme and 'xml' not in resp.info().get_content_type():
-            error = (f"Error: Content of the URL ({resp.geturl()})\n" +
-                     "is not in an XML format. " +
+        # Handle FTP or file URLs
+        scheme = urlparse(url).scheme
+        if scheme == 'file':
+            raise ValueError
+        elif scheme == 'ftp':
+            host = urlparse(url).netloc
+            path = urlparse(url).path
+            ftp = ftplib.FTP(host)
+            ftp.login()
+            r = StringIO()
+            ftp.retrlines('RETR ' + path, r.write)
+            content = r.getvalue()
+            # Remove null bytes from the output to avoid unexpected errors
+            if '\x00' in content:
+                content = content.replace('\x00', '')
+            return content
+
+        # Handle HTTP and HTTPS URLs
+        resp = requests.get(url)
+        if resp.status_code != requests.codes.ok:
+            resp.raise_for_status()
+        elif 'http' in scheme and 'xml' not in resp.headers['Content-Type']:
+            error = (f"Error: Content of the URL ({resp.url})\n" +
+                     "is not in XML format. " +
                      "Make sure the URL is correct.\n")
             raise Exception(error)
-        elif scheme == 'file':
-            file_path = url.replace("file://", "")
-            return file_path
         else:
             return resp
 
     except ValueError:
-        # If argument is not entered as an URL
+        # If argument is a file URL type or not an URL at all
+        if scheme == 'file':
+            url = url.replace('file://', '')
         if not os.path.isfile(url):
             error = (f"Error: Invalid value for {arg_type}\n" +
                      f"Path {url} does not exist.\n")
@@ -30,14 +55,14 @@ def xmlFromURL(url, arg_type):
         else:
             return None
 
-    except urllib.error.HTTPError as err:
+    except requests.exceptions.HTTPError as err:
         # If request responds with HTTP error
         error = (str(err) + "" + url + "\nMake sure the URL is correct.\n")
         raise Exception(error)
 
-    except urllib.error.URLError:
-        error = (f"Error: Invalid value for {arg_type}\n" +
-                 f"Path {url.replace('file://', '')} does not exist.\n")
+    except ftplib.Error as err:
+        # If request responds with FTP error
+        error = (str(err) + f" ({url})\nMake sure the URL is correct.\n")
         raise Exception(error)
 
 
@@ -53,12 +78,12 @@ def cli(xml_file, schema_file, verbose):
     try:
         xml_resp = xmlFromURL(xml_file, 'XML_FILE')
         if xml_resp:
-            xml_file = xml_resp
+            xml_file = xml_resp.text
             xml_from_url = True
 
         xsd_resp = xmlFromURL(schema_file, 'SCHEMA_FILE')
         if xsd_resp:
-            schema_file = xsd_resp
+            schema_file = str(xsd_resp)
 
     except Exception as error:
         click.echo(error)
@@ -103,9 +128,6 @@ def cli(xml_file, schema_file, verbose):
 
 
 if __name__ == "__main__":
-    # Change environment variables for Click commands to work
-    os.environ['LC_ALL'] = 'en_US.utf-8'
-    os.environ['LANG'] = 'en_US.utf-8'
     cli()
     # Revert environment variables back
     os.unsetenv['LC_ALL']
