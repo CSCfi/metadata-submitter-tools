@@ -4,8 +4,8 @@ import requests
 import xml
 import xmlschema
 import ftplib
-from io import StringIO
 from urllib.parse import urlparse
+from io import StringIO
 
 # Change environment variables for Click commands to work
 os.environ['LC_ALL'] = 'en_US.utf-8'
@@ -27,6 +27,7 @@ def xmlFromURL(url, arg_type):
             r = StringIO()
             ftp.retrlines('RETR ' + path, r.write)
             content = r.getvalue()
+            r.close()
             # Remove null bytes from the output to avoid unexpected errors
             if '\x00' in content:
                 content = content.replace('\x00', '')

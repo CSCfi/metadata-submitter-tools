@@ -1,4 +1,6 @@
 import unittest
+import responses
+from unittest.mock import patch, Mock
 from click.testing import CliRunner
 from pathlib import Path
 
@@ -154,61 +156,108 @@ class TestXMLValidator(unittest.TestCase):
         self.assertEqual("The XML file: SUBMISSION.xml\nis invalid.\n\n",
                          result.output)
 
-    def test_valid_xml_from_url(self):
-        """Test validating XML from URL."""
-
-        # XML from European Nucleotide Archive browser
-        xml_url = "https://www.ebi.ac.uk/ena/browser/api/xml/SAMEA2620084"
-        xsd_name = "SRA.sample.xsd"
+    def test_verbose_option(self):
+        """Test verbose flag outputs some error details when XML is invalid."""
+        xml_name = "invalid_SUBMISSION.xml"
+        xsd_name = "SRA.submission.xsd"
+        xml = (self.xml_path / xml_name).as_posix()
         xsd = (self.xsd_path / xsd_name).as_posix()
-        result = self.runner.invoke(cli, [xml_url, xsd])
+        result = self.runner.invoke(cli, ['-v', xml, xsd])
 
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
-        self.assertIn("The XML from the URL:\n" + xml_url + "\nis valid.\n\n",
-                      result.output)
+        self.assertIn("Error:\nfailed validating", result.output)
+
+    def test_valid_xml_from_url(self):
+        """Test validating XML from URL."""
+        with responses.RequestsMock() as rsps:
+            # Read one of the test files
+            xml_name = "SAMPLE.xml"
+            xml = (self.xml_path / xml_name).as_posix()
+            f = open(xml, 'rb')
+            body = f.read()
+            f.close()
+
+            # Mock HTTP request with the test files as the request body
+            xml_url = 'http://example.com/SAMPLE.xml'
+            rsps.add(responses.GET, xml_url,
+                     body=body, status=200,
+                     content_type='application/xml')
+            xsd_name = "SRA.sample.xsd"
+            xsd = (self.xsd_path / xsd_name).as_posix()
+
+            result = self.runner.invoke(cli, [xml_url, xsd])
+            # Exit correctly with code 0
+            self.assertEqual(result.exit_code, 0)
+            # The correct output is given
+            self.assertIn("The XML from the URL:\n" + xml_url +
+                          "\nis valid.\n\n", result.output)
 
     def test_http_error(self):
         """Test when URL gives HTTP error."""
-        xml_url = "https://www.ebi.ac.uk/ena/browser/api/xml/wrong_indicator"
-        xsd_name = "SRA.sample.xsd"
-        xsd = (self.xsd_path / xsd_name).as_posix()
-        result = self.runner.invoke(cli, [xml_url, xsd])
+        with responses.RequestsMock() as rsps:
+            # Mock error response
+            xml_url = 'http://example.com/error.xml'
+            rsps.add(responses.GET, xml_url,
+                     body='<ErrorDetails></ErrorDetails>', status=400,
+                     content_type='application/xml')
+            xsd_name = "SRA.sample.xsd"
+            xsd = (self.xsd_path / xsd_name).as_posix()
 
-        # Exit correctly with code 0
-        self.assertEqual(result.exit_code, 0)
-        # The correct output is given
-        self.assertIn("400 Client Error:", result.output)
+            result = self.runner.invoke(cli, [xml_url, xsd])
+            # Exit correctly with code 0
+            self.assertEqual(result.exit_code, 0)
+            # The correct output is given
+            self.assertIn("400 Client Error:", result.output)
 
     def test_url_to_non_xml(self):
         """Test for URL that does not return XML."""
-        xml_url = "https://www.example.com"
-        xsd_name = "SRA.sample.xsd"
-        xsd = (self.xsd_path / xsd_name).as_posix()
-        result = self.runner.invoke(cli, [xml_url, xsd])
+        with responses.RequestsMock() as rsps:
+            # Mock error response
+            xml_url = 'http://example.com/'
+            rsps.add(responses.GET, xml_url,
+                     body='<html></html>', status=200,
+                     content_type='text/html')
+            xsd_name = "SRA.sample.xsd"
+            xsd = (self.xsd_path / xsd_name).as_posix()
 
-        # Exit correctly with code 0
-        self.assertEqual(result.exit_code, 0)
-        # The correct output is given
-        self.assertIn("Error: Content of the URL", result.output)
+            result = self.runner.invoke(cli, [xml_url, xsd])
+            # Exit correctly with code 0
+            self.assertEqual(result.exit_code, 0)
+            # The correct output is given
+            self.assertIn("Error: Content of the URL", result.output)
 
-    def test_ftp_url(self):
+    # FIX ftplib mocking
+    @patch('_io.StringIO', autospec=True)
+    @patch('ftplib.FTP', autospec=True)
+    def test_ftp_url(self, mock_ftp_constructor, mock_stringio):
         """Test validating with schema from FTP URL."""
         xml_name = "SUBMISSION.xml"
-        xsd_url = ("ftp://ftp.ebi.ac.uk/pub/databases/ena/doc/xsd/sra_1_5/"
-                   "SRA.submission.xsd")
         xml = (self.xml_path / xml_name).as_posix()
+        xsd_name = "SRA.submission.xsd"
+        xsd = (self.xsd_path / xsd_name).as_posix()
+        f = open(xsd, 'rb')
+        schema = f.read()
+        f.close()
+
+        xsd_url = "ftp://ftp.local.server/test_files/schema.xsd"
+        mock_ftp = mock_ftp_constructor.return_value
+        mock_stringio = Mock()
+        mock_stringio.getvalue.return_value = schema
         result = self.runner.invoke(cli, [xml, xsd_url])
+        mock_ftp_constructor.assert_called_with('ftp.local.server')
+        self.assertTrue(mock_ftp.login.called)
+        self.assertTrue(mock_ftp.retrlines.called)
+        self.assertEqual(mock_stringio.getvalue(), schema)
 
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
-        '''
         self.assertEqual("The XML file: SUBMISSION.xml\nis valid.\n\n",
                          result.output)
-        '''
 
+    '''
     def test_both_args_as_urls(self):
         """Test with both arguments as URLs with valid files."""
         xml_url = "https://www.ebi.ac.uk/ena/browser/api/xml/SAMEA2620084"
@@ -220,10 +269,8 @@ class TestXMLValidator(unittest.TestCase):
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
-        '''
         self.assertIn("The XML from the URL", result.output)
         self.assertIn("is valid.", result.output)
-        '''
 
     def test_wrong_file_type_from_ftp(self):
         """Test when FTP URL provides another file type than xml/xsd."""
@@ -238,19 +285,7 @@ class TestXMLValidator(unittest.TestCase):
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
         self.assertEqual("Faulty XML or XSD file was given.\n\n", result.output)
-
-    def test_verbose_option(self):
-        """Test verbose flag outputs some error details when XML is invalid."""
-        xml_name = "invalid_SUBMISSION.xml"
-        xsd_name = "SRA.submission.xsd"
-        xml = (self.xml_path / xml_name).as_posix()
-        xsd = (self.xsd_path / xsd_name).as_posix()
-        result = self.runner.invoke(cli, ['-v', xml, xsd])
-
-        # Exit correctly with code 0
-        self.assertEqual(result.exit_code, 0)
-        # The correct output is given
-        self.assertIn("Error:\nfailed validating", result.output)
+    '''
 
 
 if __name__ == '__main__':
