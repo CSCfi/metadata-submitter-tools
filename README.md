@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.com/CSCfi/metadata-submitter-tools.svg?branch=master)](https://travis-ci.com/CSCfi/metadata-submitter-tools)
+![Python Unit Tests](https://github.com/CSCfi/metadata-submitter-tools/workflows/Python%20Unit%20Tests/badge.svg)
+![Python style check](https://github.com/CSCfi/metadata-submitter-tools/workflows/Python%20style%20check/badge.svg)
 
 # Metadata submitter tools
 
