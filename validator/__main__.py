@@ -7,6 +7,10 @@ from urllib.parse import urlparse
 from io import BytesIO
 from pathlib import Path
 
+# Change environment variables for Click commands to work
+os.environ['LC_ALL'] = 'en_US.utf-8'
+os.environ['LANG'] = 'en_US.utf-8'
+
 
 def _process_http_reponse(url, scheme):
     """Process response from HTTP/HTTPS url."""
@@ -136,9 +140,6 @@ def cli(xml_file, schema_file, verbose):
 
 
 if __name__ == "__main__":
-    # Change environment variables for Click commands to work
-    os.environ['LC_ALL'] = 'en_US.utf-8'
-    os.environ['LANG'] = 'en_US.utf-8'
     cli()
     # Revert environment variables back
     os.unsetenv('LC_ALL')
