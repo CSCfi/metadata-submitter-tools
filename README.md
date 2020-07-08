@@ -8,6 +8,8 @@ Command-line tool for validating a given XML file against a specific XSD Schema.
 
 ### Installing
 
+Note: The tool requires Python 3.6+
+
 Clone the project and install with `pip`:
 ```
 git clone https://github.com/CSCfi/metadata-submitter-tools.git
