@@ -214,7 +214,7 @@ class TestXMLValidator(unittest.TestCase):
     def test_url_to_non_xml(self):
         """Test for URL that does not return XML."""
         with responses.RequestsMock() as rsps:
-            # Mock error response
+            # Mock non-xml/non-plaintext response
             xml_url = 'http://example.com/'
             rsps.add(responses.GET, xml_url,
                      body='<html></html>', status=200,
