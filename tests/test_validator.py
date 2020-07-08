@@ -139,8 +139,8 @@ class TestXMLValidator(unittest.TestCase):
         # Exit correctly with code 0
         self.assertEqual(result.exit_code, 0)
         # The correct output is given
-        self.assertIn("The XML file: invalid_SUBMISSION.xml\nis invalid.\n\n",
-                      result.output)
+        expected = "The XML file: invalid_SUBMISSION.xml\nis invalid.\n\n"
+        self.assertEqual(expected, result.output)
 
     def test_valid_xml_against_wrong_schema(self):
         """Test case for a valid xml file against the wrong schema."""
