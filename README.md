@@ -41,7 +41,7 @@ The `<option>` can be `--help` for showing help and `-v` or `--verbose` for deli
 
 Below is a terminal demonstration of the usage of this tool, which displays the different outputs the CLI will produce:
 
-[![asciicast](https://asciinema.org/a/ykioH41E9Y38fG404hReQedyc.svg)](https://asciinema.org/a/ykioH41E9Y38fG404hReQedyc)
+[![asciicast](https://asciinema.org/a/FWYs48FhJ1mTFEFsWsNUbP43g.svg)](https://asciinema.org/a/FWYs48FhJ1mTFEFsWsNUbP43g)
 
 ### Packages/Libraries used
 
