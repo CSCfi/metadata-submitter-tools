@@ -24,3 +24,7 @@ jobs:
         pip install tox tox-gh-actions
     - name: Test flake8 syntax with tox
       run: tox -e flake8
+    - name: Black formatting check
+      run: tox -e black
+    - name: Type hints check
+      run: tox -e mypy

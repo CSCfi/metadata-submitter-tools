@@ -1,3 +1,5 @@
+"""Setup for Metadata Validator."""
+
 from setuptools import setup, find_packages
 
 from validator import __author__, __title__, __version__
@@ -15,7 +17,9 @@ setup(
     packages=find_packages(exclude=["tests"]),
     include_package_data=True,
     install_requires=requirements,
-    extras_require={"test": ["coverage==5.5", "pytest==6.2.4", "pytest-cov==2.12.1", "coveralls==3.2.0", "tox=3.24.1"]},
+    extras_require={
+        "test": ["coverage==5.5", "pytest==6.2.4", "pytest-cov==2.12.1", "coveralls==3.2.0", "tox==3.24.1"]
+    },
     entry_points="""
         [console_scripts]
         xml-validate=validator.__main__:cli
