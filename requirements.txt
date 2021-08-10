@@ -1,4 +1,4 @@
-click
-xmlschema
-requests
-responses
+click==8.0.1
+xmlschema==1.7.0
+requests==2.26.0
+responses==0.13.4
