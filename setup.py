@@ -18,7 +18,7 @@ setup(
     include_package_data=True,
     install_requires=requirements,
     extras_require={
-        "test": ["coverage==5.5", "pytest==6.2.4", "pytest-cov==2.12.1", "coveralls==3.2.0", "tox==3.24.3"]
+        "test": ["coverage==5.5", "pytest==6.2.4", "pytest-cov==2.12.1", "coveralls==3.2.0", "tox==3.24.4"]
     },
     entry_points="""
         [console_scripts]
