@@ -103,7 +103,7 @@ def cli(xml_file: str, schema_file: str, verbose: str) -> None:
         return None
 
     try:
-        xmlschema.validate(xml_file, schema=schema_file)
+        xmlschema.validate(xml_file, schema=schema_file)  # type: ignore
         # When validation succeeds
         if xml_from_url:
             click.echo(f"The XML from the URL:\n{requested_url}")
