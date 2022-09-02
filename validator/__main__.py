@@ -7,6 +7,7 @@ import requests
 import xmlschema
 import ftplib
 from urllib.parse import urlparse
+from xml.etree.ElementTree import ParseError
 from io import BytesIO
 from pathlib import Path
 
@@ -124,7 +125,7 @@ def cli(xml_file: str, schema_file: str, verbose: str) -> None:
             click.secho("Error:", bold=True)
             click.echo(err)
 
-    except xmlschema.etree.ParseError as err:
+    except ParseError as err:
         # If there is a syntax error with either file
         click.echo("Faulty XML or XSD file was given.\n")
         if verbose:
