@@ -17,7 +17,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=requirements,
-    extras_require={"test": ["coverage==6.4.4", "pytest==7.1.2", "pytest-cov==3.0.0", "tox==3.25.1"]},
+    extras_require={"test": ["coverage==6.4.4", "pytest==7.1.3", "pytest-cov==3.0.0", "tox==3.25.1"]},
     entry_points="""
         [console_scripts]
         xml-validate=validator.__main__:cli
