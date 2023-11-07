@@ -9,7 +9,7 @@ Command-line tool for validating a given XML file against a specific XSD Schema.
 
 ### Installing
 
-Note: The tool requires Python 3.7+
+Note: The tool requires Python 3.11+
 
 Clone the project and install with `pip`:
 ```
