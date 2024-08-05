@@ -1,4 +1,4 @@
 click==8.1.7
-xmlschema==3.3.1
+xmlschema==3.3.2
 requests==2.32.3
 responses==0.25.3
